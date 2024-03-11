@@ -1,0 +1,38 @@
+\documentclass{article}
+\title{FPGA flowline - a compromise between speed and area}
+\author{me}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+FPGA-\(Field-Programmable Gate Array\),is a kind of integrated circuit that can be programmed in the field after manufacturing.
+We can change the function of the FPGA by reprogramming it with \textbf{verilog}.
+
+So we can call the physical devices in the FPGA as well as the hardware IP cores to achieve our goal.
+Therefore, an important concept occurs, flowline of FPGA.
+To explain more clearly, just imaging FPGA as an industry, the user of FPGA is the manager of the industry,
+now the manager wants to repeatedly execute a task many times. He has two choices. First, using a complete machine which can finish the task independently. 
+But the first machine must finish the task one by one, so it is slow. Second, this machine is broken down into multiple parts, with conveyor belts linking each part to the other. 
+Such a form is the flowline, and the conveyor belts are the registers actually. That form can solve the problem of the running speed.
+
+However, it isn't perfect. There are a finite number of physical devices in an FPGA.
+For example, there are a finite number of CLB-Configurable Logic Bolck inside, a finite number of registers, and a finite number of hardware IP cores.
+And when we execute the task in a form of flowline, we will use more physical devices, more registers, which is equivalent to this task occupies a larger area of the FPGA and more power.
+In fact, when we do projects with FPGA, a single FPGA has to perform various tasks. So a task can't take up too much physical space, and at the same time it has to be fast.
+Therefore, how to \textbf{optimize the number of flowline stages to ensure high operating speed and small physical space at the same time} 
+is what every FPGA engineer or other chip engineer needs to carefully consider.
+
+So,what our group wants to do is how to optimize the number of flowline stages
+to compromise speed and area, with a library of FPGA development boards,under different tasks.
+\section{abstract}
+\begin{itemize}
+    \item language: verilog
+    \item tools: gowinEDA-version of education or other EDA
+    \item elements: RTL figure-\textbf{area}, Allowable Maximum Clock Frequency-\textbf{speed}
+    \item number of flowline stages: according to program of verilog
+    \item tasks: 
+    \item properties of FPGA: I/O bandwidth, number of IP cores, internal architecture, etc.
+    \item fruits: Is there a strong relation between the optimal number of flowline stages and certain FPGA properties?If so, what is the function.
+\end{itemize}
+\end{document}
