@@ -1,67 +1,9 @@
 import matplotlib.pyplot as plt
+import Direction
 import numpy as np
 
-global cnt, paused
-cnt = 0; paused = False
-
-class robot:
-    def __init__(self, x, y, dir, index):
-        self.properties = {
-            'x': 0.25,
-            'y': -0.75,
-            'dir': 'up',
-            'index': 0
-        }
-        self.properties['x'] = x
-        self.properties['y'] = y
-        self.properties['dir'] = dir
-        self.properties['index'] = index
-        print('#1', i)
-        print('#2', self.properties['index'])
-
-    def move(self):
-        if self.properties['dir'] == 'up':
-            if self.properties['y'] < 8 and 0 < self.properties['x'] < 8:  # 在虚线范围内才能向上移动
-                self.properties['y'] += 1
-        elif self.properties['dir'] == 'down':
-            if self.properties['y'] > 0 and 0 < self.properties['x'] < 8:  # 在虚线范围内才能向下移动
-                self.properties['y'] -= 1
-        elif self.properties['dir'] == 'left':
-            if self.properties['x'] > 0 and 0 < self.properties['y'] < 8:  # 在虚线范围内才能向左移动
-                self.properties['x'] -= 1
-        elif self.properties['dir'] == 'right':
-            if self.properties['x'] < 8 and 0 < self.properties['x'] < 8:  # 在虚线范围内才能向右移动
-                self.properties['x'] += 1
-        
-    def set_dir(self, dir):
-        self.properties['dir'] = dir
-    
-    def get_x(self):
-        return self.plt_robot().get_x()
-    
-    def get_y(self):
-        return self.plt_robot().get_y()
-
-    def get_dir(self):
-        return self.properties['dir']
-    
-    def set_index(self, index):
-        self.properties['index'] = index
-    
-    def get_index(self):
-        return self.properties['index']
-    
-    def plt_robot(self):
-        return plt.Rectangle((self.properties['x'] + self.properties['index'], self.properties['y']),
-                0.5, 0.5, color='yellow', alpha = 1)
-    
-    def plt_label(self):
-        return plt.text(self.properties['x'] + self.properties['index'], self.properties['y'], str(self.properties['index'] + 1),
-                 ha='center', va='center', color = 'red',fontsize=12)
-    
-robots = []    
-for i in range(8):        
-    robots.append(robot(0.25, -0.75, 'up', i))
+global  paused
+paused = False
 
 # 创建标签
 text_send = 'from Shanghai'
@@ -103,7 +45,7 @@ for window in windows_right:
     ax.add_patch(window)
 for window in windows_top:
     ax.add_patch(window)
-for rob in robots:
+for rob in Direction.robots:
     ax.add_patch(rob.plt_robot())
 
 # 设置坐标轴范围和标签
@@ -118,11 +60,10 @@ def update(frame):
     #     cnt = 0
     # else:
     #     cnt += 1
-    for robot in (robots):
+    for robot in (Direction.robots):
         robot.move()
         return robot.plt_robot(), robot.plt_label()
 
-print(robots[4].get_x(), robots[4].get_y(),robots[4].get_dir(),robots[4].get_index())
      
 # from matplotlib.animation import FuncAnimation
 # ani = FuncAnimation(fig, update, frames=range(100), interval=50, blit=True)
