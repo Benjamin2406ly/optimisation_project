@@ -1,11 +1,9 @@
 import Robot
 
 robots = []    
-for i in range(8):        
-    robots.append(Robot.robot((0.25, -0.75), 'up', i, None, (255-25*i, 25*i, 0)))
-
-def path_send_delivery(robot):
-    pass
+for i in range(8):     
+    color = (255-30*i, 30*i, 0)
+    robots.append(Robot.robot((0, -1), 'up', i, None, f'#{color[0]:02x}{color[1]:02x}{color[2]:02x}'))
 
 def direction_if_oppose(self,other):
     if self.dir == 'up' and other.dir == 'down':
@@ -34,7 +32,7 @@ def robot_collision_decesion_making(robots):
                         pass
 
         def robot_next_will_ocuppied():     
-            if robot.next_position()==other_robot.next_position():
+            if robot.next_position().if_eq(other_robot.next_position()):
                 for other_robot in robots_without_robot:  
                     if direction_if_oppose(robot,other_robot):
                         robot.set_dir('left')

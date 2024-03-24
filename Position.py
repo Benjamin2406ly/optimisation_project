@@ -16,3 +16,6 @@ class position:
             self.occupied = False
         else:
             self.occupied = True
+    
+    def if_eq(self, other):
+        return self.x == other.x and self.y == other.y

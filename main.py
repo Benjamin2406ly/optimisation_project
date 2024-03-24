@@ -1,52 +1,56 @@
 import matplotlib.pyplot as plt
+import random
 import Direction
-import numpy as np
+import InitWindow
+import SendWindow
+import Delivery
 
-global  paused
+global paused
 paused = False
-
 # 创建标签
-text_send = 'from Shanghai'
-text_receive = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']   
+text_receive = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']  
+
+# 创建8个自上海发货的窗口
+initwindows = [InitWindow.initwindow(i, (i-1, -1), None) for i in range(1, 9)]
+
+# 创建24个字母城市的接收窗口
+sendwindows_left = [SendWindow.sendwindow(text_receive[i],(-1, i)) for i in range(8)]
+sendwindows_right = [SendWindow.sendwindow(text_receive[i + 8],(8, 7 - i)) for i in range(8)]
+sendwindows_top = [SendWindow.sendwindow(text_receive[i + 16],(i, 8)) for i in range(8)]
+
+# 创建1000个随机的快递
+items = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X']
+delivery_array = [Delivery.delivery(random.choice(items)) for _ in range(1000)]
 
 # 创建画布和坐标轴
 fig, ax = plt.subplots()
 
-# 创建一个8x8的中转站空间
+# 画出8x8的中转站空间
 space = plt.Rectangle((0, 0), 8, 8, fill=False, color='black')
 
-# 创建8个标签为“自上海发货”的窗口
-windows_bottom = [plt.Rectangle((i, -1), 1, 1, linewidth=1, edgecolor='white') for i in range(8)]
+# 画出8个发货窗口
+for initwindow in initwindows:
+    initwindow.plt_initwindow(ax)
+    initwindow.plt_label(ax)
 
-# 创建24个字母城市的接收窗口
-windows_left = [plt.Rectangle((-1, i), 1, 1, linewidth=1, edgecolor='white') for i in range(8)]
-windows_right = [plt.Rectangle((8, i), 1, 1, linewidth=1, edgecolor='white') for i in range(8)]
-windows_top = [plt.Rectangle((i, 8), 1, 1, linewidth=1, edgecolor='white') for i in range(8)]
+# 画出24个接收窗口
+for i in range(8):
+    sendwindows_left[i].plt_sendwindow(ax)
+    sendwindows_left[i].plt_label(ax)
+    sendwindows_right[i].plt_sendwindow(ax)
+    sendwindows_right[i].plt_label(ax)
+    sendwindows_top[i].plt_sendwindow(ax)
+    sendwindows_top[i].plt_label(ax)
 
 # 绘制网格线
 for i in range(8):
     plt.plot([i + 0.5, i + 0.5], [0, 8], color='gray', linestyle='--')
     plt.plot([0, 8], [i + 0.5, i + 0.5], color='gray', linestyle='--')
 
-# 添加标签
-plt.text(4, -2, text_send, ha='center', va='center', fontsize=12)
-for i in range(8):
-    plt.text(-1.5, i + 0.5, text_receive[i], ha='center', va='center', fontsize=12)
-    plt.text(i + 0.5, 9.5, text_receive[i + 8], ha='center', va='center', fontsize=12)
-    plt.text(9.5, 7.5 - i, text_receive[i + 16], ha='center', va='center', fontsize=12)
-
-# 添加图形元素到坐标轴
-ax.add_patch(space)
-for window in windows_bottom:
-    ax.add_patch(window)
-for window in windows_left:
-    ax.add_patch(window)
-for window in windows_right:
-    ax.add_patch(window)
-for window in windows_top:
-    ax.add_patch(window)
-for rob in Direction.robots:
-    ax.add_patch(rob.plt_robot())
+# 添加机器人
+for robot in Direction.robots:
+    robot.plt_robot(ax)
+    robot.plt_label(ax)
 
 # 设置坐标轴范围和标签
 ax.set_xlim(-3, 11)
@@ -56,15 +60,10 @@ ax.set_yticks([])
 
 # 更新机器人的位置和标签
 def update(frame):
-    # if cnt == 10:
-    #     cnt = 0
-    # else:
-    #     cnt += 1
-    for robot in (Direction.robots):
+    for robot in Direction.robots:
         robot.move()
         return robot.plt_robot(), robot.plt_label()
 
-     
 # from matplotlib.animation import FuncAnimation
 # ani = FuncAnimation(fig, update, frames=range(100), interval=50, blit=True)
 
