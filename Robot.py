@@ -3,17 +3,19 @@ import Position
 import Delivery
 
 class robot:    
-    def __init__(self, position, dir, index, item, color):
+    def __init__(self, position, dir, index, delivery, color):
         # position.x: 0.25,
         # position.y: -0.75,
         # dir: 'up',
         # index: 0   
         # occupied: False
         self.position = Position.position(position[0], position[1])
+        self.delivery = Delivery.delivery(delivery)
         self.position.robot = self 
+        self.delivery.robot = self
         self.dir = dir
         self.index = index
-        self.item = item
+        self.item = self.delivery.item
         self.color = color
         self.in_task = False
 
@@ -33,23 +35,19 @@ class robot:
         elif self.dir == 'stop':
             pass
         
-    def set_dir(self, dir):
-        self.dir = dir
+    def set_dir(self, direction):
+        self.dir = direction
     
-    def set_index(self, index):
-        self.index = index
+    def set_index(self, i):
+        self.index = i
     
     def plt_robot(self,ax):
-        ax.add_patch(plt.Rectangle((self.position.x + self.index + 0.25, self.position.y + 0.25),
-                0.5, 0.5, color=self.color, alpha = 1))
+        ax.add_patch(plt.Rectangle((self.position.x + 0.5, self.position.y + 0.5),
+                1, 1, color=self.color, alpha = 1))
     
     def plt_label(self,ax):
-        ax.text(self.position.x + self.index + 0.25, self.position.y + 0.25, str(self.item),
-                ha='center', va='center', color = 'black',fontsize=12)
-    
-    def position_to_index(self,position):
-        if (self.position.x, self.position.y) == position:
-            return self.index
+        ax.text(self.position.x + 1, self.position.y + 1, str(self.item),
+                ha='center', va='center', color = 'black',fontsize=8)
 
     def next_position(self):
         if self.dir == 'up':
@@ -61,13 +59,14 @@ class robot:
         elif self.dir == 'right':
             return Position.position(self.position.x + 1, self.position.y)
     
-    def catch_delivery(self, delivery):
-        self.item = delivery.item
+    def catch_delivery(self, dlvery:Delivery.delivery):
+        self.delivery = dlvery
         self.in_task = True
-        delivery.robot = self
-        delivery.if_catched()
+        self.delivery.robot = self
+        self.delivery.if_catched()
 
-    def send_delivery(self, delivery):
-        delivery.robot = None
+    def send_delivery(self):
+        self.delivery.robot = None
+        self.delivery = None
         self.item = None
         self.in_task = False
