@@ -1,6 +1,6 @@
 import Position
 class delivery:
-    def __init__(self, imformation):
+    def __init__(self, imformation:tuple):
         self.item = imformation[0]
         self.robot = None
         self.sendwindow_position = Position.position(imformation[1][0], imformation[1][1])

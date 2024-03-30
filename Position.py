@@ -18,4 +18,7 @@ class position:
             self.occupied = True
     
     def if_eq(self, other):
-        return self.x == other.x and self.y == other.y
+        if other is not None:
+            return self.x == other.x and self.y == other.y
+        else:
+            return False
