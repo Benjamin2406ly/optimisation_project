@@ -10,8 +10,12 @@ import threading
 import time
 
 
+
 def init():
-    global items, informations, initwindows, sendwindows_left, sendwindows_right, sendwindows_top, delivery_array, colors, robots, Path_length, robot_init_delivery
+    global items, informations, initwindows, sendwindows_left, sendwindows_right, sendwindows_top, delivery_array, colors, robots, Path_length, if_optimize, if_consider_collision
+
+    if_optimize = True
+    if_consider_collision = False
 
     items = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X']
     informations = [(items[i],(-2,2*i)) for i in range(8)]+[(items[i + 8],(16,14-2*i)) for i in range(8)]+[(items[i + 16],(2*i,16)) for i in range(8)]
@@ -25,6 +29,7 @@ def init():
  
     colors = [(255-30*i, 30*i, 0) for i in range(8)]
     robots = [Robot.robot((0 + 2*i, -2), 'up', i, delivery_array[i], f'#{colors[i][0]:02x}{colors[i][1]:02x}{colors[i][2]:02x}') for i in range(8)]
+
     Path_length = np.zeros((8,8))
 
     delivery_array = delivery_array[16:]
@@ -177,7 +182,8 @@ def to_destination(robot: Robot.robot, pstion: Position.position):
 
     else:
         pass
-    # robot_collision_decesion_making(robot)
+    if if_consider_collision:
+        robot_collision_decesion_making(robot)
     robot.move()
 
 # schedule
@@ -187,7 +193,11 @@ def task_assign(robot: Robot.robot, initwindow: InitWindow.initwindow):
     else:
         to_destination(robot, initwindow.position)
     
-def schedule(Path_length):  
+def schedule_optimize(Path_length):  
     row_i, col_i = linear_sum_assignment(Path_length)
     for i in range(8):
         task_assign(robots[row_i[i]], initwindows[col_i[i]])
+    
+def schedule_normal():
+    for i in range(8):
+        task_assign(robots[i], initwindows[i])

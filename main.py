@@ -123,8 +123,11 @@ def robot_send_delivery(robot:Robot.robot):
         robot.send_delivery()
 
 def main_task():
-    Direction.Path_length = Direction.path_calculation()
-    Direction.schedule(Direction.Path_length)
+    if Direction.if_optimize:
+        Direction.Path_length = Direction.path_calculation()
+        Direction.schedule_optimize(Direction.Path_length)
+    else:
+        Direction.schedule_normal()
 
 start_time = time.time()
 
