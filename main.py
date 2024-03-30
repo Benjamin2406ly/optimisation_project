@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import Direction
-import Delivery
-import Position
 import Robot
 import InitWindow
-import SendWindow
+import time
 
 Direction.init()
 
@@ -73,7 +71,7 @@ def update_patchs_and_texts(patchs, texts):
             patchs[i].set_x(Direction.robots[i - 32].position.x+0.5)
             patchs[i].set_y(Direction.robots[i - 32].position.y+0.5)
             patchs[i].set_edgecolor(Direction.robots[i - 32].edgecolor)
-            patchs[i].set_linewidth(2)
+            patchs[i].set_linewidth(3)
 
     for text in ax.texts:
         text.remove()
@@ -84,6 +82,8 @@ def update_patchs_and_texts(patchs, texts):
             texts[i][1] = Direction.initwindows[i].position.y - 1
             if Direction.initwindows[i].delivery:
                 texts[i][2] = str(Direction.initwindows[i].index) + ':' + str(Direction.initwindows[i].delivery.item)
+            else:
+                texts[i][2] = str(Direction.initwindows[i].index) + ':None'
         elif 8 <= i < 16:
             texts[i][0] = Direction.sendwindows_left[i - 8].position.x - 1
             texts[i][1] = Direction.sendwindows_left[i - 8].position.y + 1
@@ -101,15 +101,17 @@ def update_patchs_and_texts(patchs, texts):
             else:
                 texts[i][2] = 'None'
         elif 40 <= i < 48:
-            texts[i][0] = 1 + 2*(i - 40)
+            texts[i][0] = 2.5*(i - 40)
             texts[i][1] = 21
-            if Direction.delivery_array:
+            if 0 <= (i-40) <len(Direction.delivery_array):
                 texts[i][2] = '<--'+Direction.delivery_array[i-40].item
+            elif (i-40) >= len(Direction.delivery_array):
+                texts[i][2] = '<--'+'None'
 
 def update_delivery(delivery_array:Direction.delivery_array, initwindow:InitWindow.initwindow):
     if initwindow.delivery is None and delivery_array:
         initwindow.set_delivery(delivery_array[0])
-        if delivery_array:
+        if delivery_array:   
             delivery_array.pop(0)
 
 def robot_catch_delivery(robot:Robot.robot, initwindow:InitWindow.initwindow):
@@ -123,6 +125,8 @@ def robot_send_delivery(robot:Robot.robot):
 def main_task():
     Direction.Path_length = Direction.path_calculation()
     Direction.schedule(Direction.Path_length)
+
+start_time = time.time()
 
 def update(frame):
     for initwindow in Direction.initwindows:
@@ -140,31 +144,17 @@ def update(frame):
     for patch in patchs:
         ax.add_patch(patch)
     for text in texts:
-        ax.text(*text, ha = 'center', va = 'center', color = 'black',fontsize = 12)
+        ax.text(*text, ha = 'center', va = 'center', color = 'black',fontsize = 10)
+
+    if all([robot.item is None for robot in Direction.robots]) and all([initwindow.delivery is None for initwindow in Direction.initwindows]) and not Direction.delivery_array:
+        ani.event_source.stop()
+        plt.close()
     return ax,
 
-ani = FuncAnimation(fig, update, frames=range(1000), interval=500, blit=True)
-
-# def onClick(event):
-#     paused ^= True
-#     if paused:
-#         ani.event_source.stop()
-#     else:
-#         ani.event_source.start()
-
-# fig.canvas.mpl_connect('button_press_event', onClick)
-# 显示图形
+ani = FuncAnimation(fig, update, frames=range(1000), interval=1000, blit=True)
 plt.show()
 
-if not Direction.delivery_array:
-    print('All delivery has been completed!')
+end_time = time.time()
 
-# for i in range(8):
-#     print(Direction.robots[i].item)
-#     print(Direction.robots[i].delivery.item)
-
-# print(Direction.Path_length)
-# for text in texts:
-#     print(text[2])
-for robot in Direction.robots:
-    print(robot.item)
+print('All delivery has been completed!')
+print('Time:', end_time - start_time, 's')

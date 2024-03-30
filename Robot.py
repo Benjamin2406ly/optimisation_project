@@ -69,11 +69,11 @@ class robot:
         self.item = dlvery.item
         self.delivery.robot = self
         self.delivery.if_catched()
-        self.edgecolor = 'black'
+        self.edgecolor = 'white'
 
     def send_delivery(self):
         self.delivery.robot = None
         self.delivery = None
         self.item = None
         self.in_task = False
-        self.edgecolor = 'blue'
+        self.edgecolor = 'gold'

@@ -15,7 +15,7 @@ def init():
 
     items = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X']
     informations = [(items[i],(-2,2*i)) for i in range(8)]+[(items[i + 8],(16,14-2*i)) for i in range(8)]+[(items[i + 16],(2*i,16)) for i in range(8)]
-    delivery_array = [Delivery.delivery(random.choice(informations)) for _ in range(100)]
+    delivery_array = [Delivery.delivery(random.choice(informations)) for _ in range(50)]
 
     initwindows = [InitWindow.initwindow(i, (2*i-2, -2), (delivery_array[i+7])) for i in range(1, 9)]
 
@@ -37,7 +37,10 @@ def task_rest_path(robot: Robot.robot, delivery: Delivery.delivery):
         return 0
     
 def Catch_delivery_path(robot: Robot.robot, initwindow: InitWindow.initwindow):
-    return abs(robot.position.x - initwindow.position.x) + abs(robot.position.y - initwindow.position.y)
+    if initwindow.delivery is not None:
+        return abs(robot.position.x - initwindow.position.x) + abs(robot.position.y - initwindow.position.y)
+    else:
+        return 1000
 
 def path_calculation():
     for i, robot in enumerate(robots):      # 8个机器人
