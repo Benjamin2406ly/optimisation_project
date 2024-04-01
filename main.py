@@ -158,6 +158,7 @@ def main_task():
         Direction.Path_length = Direction.path_calculation()
         Direction.schedule_optimize(Direction.Path_length)
     else:
+        Direction.Path_length = Direction.path_calculation()
         Direction.schedule_normal()
 
 start_time = time.time()
@@ -180,7 +181,8 @@ def update(frame):
     for text in texts:
         ax.text(*text, ha = 'center', va = 'center', color = 'black',fontsize = 10)
     for arrow in arrows:
-        ax.arrow(*arrow, head_width=0.4, head_length=0.4, fc='black', ec='black')
+        if arrow is not None:
+            ax.arrow(*arrow, head_width=0.4, head_length=0.4, fc='blue', ec='black')
 
     if all([robot.item is None for robot in Direction.robots]) and all([initwindow.delivery is None for initwindow in Direction.initwindows]) and not Direction.delivery_array:
         ani.event_source.stop()
@@ -194,6 +196,3 @@ end_time = time.time()
 
 print('All delivery has been completed!')
 print('Time:', end_time - start_time, 's')
-
-for robot in Direction.robots:
-    print(robot.position.x, robot.position.y, robot.dir, robot.next_position.x, robot.next_position.y)   

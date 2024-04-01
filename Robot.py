@@ -37,8 +37,8 @@ class robot:
             if self.position.x < 16 and -2 < self.position.y < 16:  # 在虚线范围内才能向右移动
                 self.position.x += 2
         elif self.dir == 'stop':
-            self.position.x = self.position.x
-            self.position.y = self.position.y
+            self.position.x += 0
+            self.position.y += 0
         
     def set_dir(self, direction):
         self.dir = direction
@@ -79,16 +79,16 @@ class robot:
             self.next_position = Position.position(self.position.x + 2, self.position.y)
         elif self.dir == 'stop':
             self.next_position = Position.position(self.position.x, self.position.y)
-        
+
     def turn_left(self):
         if self.dir == 'up':
-            self.set_dir('left')
+            self.dir = 'left'
         elif self.dir == 'down':
-            self.set_dir('right')
+            self.dir = 'right'
         elif self.dir == 'left':
-            self.set_dir('down')
+            self.dir = 'down'
         elif self.dir == 'right':
-            self.set_dir('up')
+            self.dir = 'up'
     
     def catch_delivery(self, dlvery:Delivery.delivery):
         self.delivery = dlvery
