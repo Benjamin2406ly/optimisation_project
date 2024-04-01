@@ -21,6 +21,7 @@ class robot:
         self.index = index
         self.color = color
         self.edgecolor = ''
+        self.next_position = Position.position(self.position.x, self.position.y)
     
     def move(self):
         if self.dir == 'up':
@@ -36,7 +37,8 @@ class robot:
             if self.position.x < 16 and -2 < self.position.y < 16:  # 在虚线范围内才能向右移动
                 self.position.x += 2
         elif self.dir == 'stop':
-            pass
+            self.position.x = self.position.x
+            self.position.y = self.position.y
         
     def set_dir(self, direction):
         self.dir = direction
@@ -49,19 +51,44 @@ class robot:
                 1, 1, color=self.color, alpha = 1))
         return Rectangle_robot
     
+    def plt_arrow(self):
+        if self.dir == 'up':
+            Arrow_robot = [self.position.x + 1, self.position.y + 1.5, 0, 0.5]
+        elif self.dir == 'down':
+            Arrow_robot = [self.position.x + 1, self.position.y + 0.5, 0, -0.5]
+        elif self.dir == 'left':
+            Arrow_robot = [self.position.x + 0.5, self.position.y + 1, -0.5, 0]
+        elif self.dir == 'right':
+            Arrow_robot = [self.position.x + 1.5, self.position.y + 1, 0.5, 0]
+        elif self.dir == 'stop':
+            Arrow_robot = [self.position.x + 1, self.position.y + 1, 0, 0]
+        return Arrow_robot
+
     def plt_label(self):
         Label_robot = [self.position.x + 1, self.position.y + 1, str(self.item)]
         return Label_robot
 
-    def next_position(self):
+    def determine_next_position(self):
         if self.dir == 'up':
-            return Position.position(self.position.x, self.position.y + 2)
+            self.next_position = Position.position(self.position.x, self.position.y + 2)
         elif self.dir == 'down':
-            return Position.position(self.position.x, self.position.y - 2)
+            self.next_position = Position.position(self.position.x, self.position.y - 2)
         elif self.dir == 'left':
-            return Position.position(self.position.x - 2, self.position.y)
+            self.next_position = Position.position(self.position.x - 2, self.position.y)
         elif self.dir == 'right':
-            return Position.position(self.position.x + 2, self.position.y)
+            self.next_position = Position.position(self.position.x + 2, self.position.y)
+        elif self.dir == 'stop':
+            self.next_position = Position.position(self.position.x, self.position.y)
+        
+    def turn_left(self):
+        if self.dir == 'up':
+            self.set_dir('left')
+        elif self.dir == 'down':
+            self.set_dir('right')
+        elif self.dir == 'left':
+            self.set_dir('down')
+        elif self.dir == 'right':
+            self.set_dir('up')
     
     def catch_delivery(self, dlvery:Delivery.delivery):
         self.delivery = dlvery

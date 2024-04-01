@@ -16,6 +16,7 @@ space = plt.Rectangle((0, 0), 16, 16, fill=False, color='black')
 # 动画变量
 patchs = []
 texts = []
+arrows = []
 
 # 画出8个发货窗口
 for initwindow in Direction.initwindows:
@@ -37,6 +38,7 @@ for i in range(8):
 for robot in Direction.robots:
     patchs.append(robot.plt_robot())
     texts.append(robot.plt_label())   
+    arrows.append(robot.plt_arrow())
 
 # 添加快递列前8
 for i in range(8):
@@ -53,7 +55,7 @@ ax.set_ylim(-4, 22)
 ax.set_xticks([])
 ax.set_yticks([])
 
-def update_patchs_and_texts(patchs, texts):
+def update_patchs_and_texts(patchs, texts, arrows):
     for i in range(len(patchs)):
         if i < 8:
             patchs[i].set_x(Direction.initwindows[i].position.x)
@@ -108,6 +110,35 @@ def update_patchs_and_texts(patchs, texts):
             elif (i-40) >= len(Direction.delivery_array):
                 texts[i][2] = '<--'+'None'
 
+    for arrow in ax.patches:
+        arrow.remove()
+    for i in range(len(arrows)):
+        if Direction.robots[i].dir == 'up':
+            arrows[i][0] = Direction.robots[i].position.x + 1
+            arrows[i][1] = Direction.robots[i].position.y + 1.5
+            arrows[i][2] = 0
+            arrows[i][3] = 0.5
+        elif Direction.robots[i].dir == 'down':
+            arrows[i][0] = Direction.robots[i].position.x + 1
+            arrows[i][1] = Direction.robots[i].position.y + 0.5
+            arrows[i][2] = 0
+            arrows[i][3] = -0.5
+        elif Direction.robots[i].dir == 'left':
+            arrows[i][0] = Direction.robots[i].position.x + 0.5
+            arrows[i][1] = Direction.robots[i].position.y + 1
+            arrows[i][2] = -0.5
+            arrows[i][3] = 0
+        elif Direction.robots[i].dir == 'right':
+            arrows[i][0] = Direction.robots[i].position.x + 1.5
+            arrows[i][1] = Direction.robots[i].position.y + 1
+            arrows[i][2] = 0.5
+            arrows[i][3] = 0
+        elif Direction.robots[i].dir == 'stop':
+            arrows[i][0] = Direction.robots[i].position.x + 1
+            arrows[i][1] = Direction.robots[i].position.y + 1
+            arrows[i][2] = 0
+            arrows[i][3] = 0
+            
 def update_delivery(delivery_array:Direction.delivery_array, initwindow:InitWindow.initwindow):
     if initwindow.delivery is None and delivery_array:
         initwindow.set_delivery(delivery_array[0])
@@ -143,11 +174,13 @@ def update(frame):
         robot_send_delivery(robot)  
 
     main_task()
-    update_patchs_and_texts(patchs, texts)
+    update_patchs_and_texts(patchs, texts, arrows)
     for patch in patchs:
         ax.add_patch(patch)
     for text in texts:
         ax.text(*text, ha = 'center', va = 'center', color = 'black',fontsize = 10)
+    for arrow in arrows:
+        ax.arrow(*arrow, head_width=0.4, head_length=0.4, fc='black', ec='black')
 
     if all([robot.item is None for robot in Direction.robots]) and all([initwindow.delivery is None for initwindow in Direction.initwindows]) and not Direction.delivery_array:
         ani.event_source.stop()
@@ -161,3 +194,6 @@ end_time = time.time()
 
 print('All delivery has been completed!')
 print('Time:', end_time - start_time, 's')
+
+for robot in Direction.robots:
+    print(robot.position.x, robot.position.y, robot.dir, robot.next_position.x, robot.next_position.y)   

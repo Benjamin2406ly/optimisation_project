@@ -6,20 +6,17 @@ import Delivery
 import random
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-import threading
-import time
-
-
 
 def init():
-    global items, informations, initwindows, sendwindows_left, sendwindows_right, sendwindows_top, delivery_array, colors, robots, Path_length, if_optimize, if_consider_collision
+    global items, informations, initwindows, sendwindows_left, sendwindows_right, sendwindows_top, delivery_array, colors, robots, Path_length, if_optimize, if_consider_collision,num_delivery
 
-    if_optimize = True
-    if_consider_collision = False
+    num_delivery = 50
+    if_optimize = False
+    if_consider_collision = True
 
     items = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X']
     informations = [(items[i],(-2,2*i)) for i in range(8)]+[(items[i + 8],(16,14-2*i)) for i in range(8)]+[(items[i + 16],(2*i,16)) for i in range(8)]
-    delivery_array = [Delivery.delivery(random.choice(informations)) for _ in range(50)]
+    delivery_array = [Delivery.delivery(random.choice(informations)) for _ in range(num_delivery)]
 
     initwindows = [InitWindow.initwindow(i, (2*i-2, -2), (delivery_array[i+7])) for i in range(1, 9)]
 
@@ -56,7 +53,6 @@ def path_calculation():
                 Path_length[i][j] = Catch_delivery_path(robot, initwindow) + task_rest_path(robot, initwindow.delivery)
     return Path_length
 
-# avoid collision
 def direction_if_oppose(self: Robot.robot, other: Robot.robot):
     if self.dir == 'up' and other.dir == 'down':
         return True
@@ -69,35 +65,45 @@ def direction_if_oppose(self: Robot.robot, other: Robot.robot):
     else:
         return False
 
-def robot_next_being_ocuppied(attempt, robot: Robot.robot):
+def robot_next_being_ocuppied(attempt, robot: Robot.robot, other_robot: Robot.robot):
+    robot.determine_next_position()
+    other_robot.determine_next_position()
     if attempt > 3:
         return
-    if robot.next_position().occupied:
-        if robot.next_position().robot.dir == 'stop':
-            robot.set_dir('stop')
-        elif robot.next_position().robot.dir != 'stop':
-            if direction_if_oppose(robot,robot.next_position().robot):
-                robot.set_dir('left')
-                robot_next_being_ocuppied(attempt + 1, robot)
-
-def robot_next_will_ocuppied(attempt, robot: Robot.robot):
-    robots_without_robot = [r for r in robots if r != robot]
+    elif robot.index == other_robot.index:
+        return
+    elif robot.next_position.if_eq(other_robot.position):
+        if other_robot.dir == 'stop':
+            robot.turn_left()
+            robot.determine_next_position()
+        elif other_robot.dir != 'stop':
+            if direction_if_oppose(robot,other_robot):
+                robot.turn_left()
+                robot_next_being_ocuppied(attempt + 1, robot, other_robot)
+                
+def robot_next_will_ocuppied(attempt, robot: Robot.robot, other_robot: Robot.robot):
+    robot.determine_next_position()
+    other_robot.determine_next_position()
     if attempt > 3:
         return     
-    for other_robot in robots_without_robot:      
-        if robot.next_position().if_eq(other_robot.next_position()):    
-            if direction_if_oppose(robot,other_robot):
-                robot.set_dir('left')
-                robot_next_will_ocuppied(attempt + 1, robot)
-            elif not direction_if_oppose(robot,other_robot):
-                if robot.index > other_robot.index:
-                    other_robot.set_dir('stop')
-                elif robot.index < other_robot.index:
-                    robot.set_dir('stop')
+    elif robot.index == other_robot.index:
+        return
+    elif robot.next_position.if_eq(other_robot.next_position):    
+        if direction_if_oppose(robot,other_robot):
+            robot.turn_left()
+            robot_next_will_ocuppied(attempt + 1, robot, other_robot)
+        elif not direction_if_oppose(robot,other_robot):
+            if robot.index > other_robot.index:
+                other_robot.set_dir('stop')
+                other_robot.determine_next_position()
+            elif robot.index < other_robot.index:
+                robot.set_dir('stop')
+                robot.determine_next_position()
 
-def robot_collision_decesion_making(robot: Robot.robot):    
-    robot_next_being_ocuppied(0, robot)
-    robot_next_will_ocuppied(0, robot)
+def robot_collision_decesion_making(robot: Robot.robot, robots):  
+    for other_robot in robots: 
+        robot_next_being_ocuppied(0, robot, other_robot)
+        robot_next_will_ocuppied(0, robot, other_robot)
 
 # move to destination
 def to_destination(robot: Robot.robot, pstion: Position.position):
@@ -183,7 +189,7 @@ def to_destination(robot: Robot.robot, pstion: Position.position):
     else:
         pass
     if if_consider_collision:
-        robot_collision_decesion_making(robot)
+        robot_collision_decesion_making(robot, robots)
     robot.move()
 
 # schedule
@@ -196,8 +202,11 @@ def task_assign(robot: Robot.robot, initwindow: InitWindow.initwindow):
 def schedule_optimize(Path_length):  
     row_i, col_i = linear_sum_assignment(Path_length)
     for i in range(8):
-        task_assign(robots[row_i[i]], initwindows[col_i[i]])
-    
+        if initwindows[col_i[i]].delivery is None and delivery_array is None:
+            robots[row_i[i]].set_dir('stop')
+        else:
+            task_assign(robots[row_i[i]], initwindows[col_i[i]])
+
 def schedule_normal():
     for i in range(8):
         task_assign(robots[i], initwindows[i])
