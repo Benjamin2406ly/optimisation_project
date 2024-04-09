@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import Position
 import Delivery
+import random
 
 class robot:    
     def __init__(self, position:tuple, dir, index, delivery:Delivery.delivery, color):
@@ -20,7 +21,7 @@ class robot:
         self.dir = dir
         self.index = index
         self.color = color
-        self.edgecolor = ''
+        self.edgecolor = 'white'
         self.next_position = Position.position(self.position.x, self.position.y)
     
     def move(self):
@@ -80,16 +81,16 @@ class robot:
         elif self.dir == 'stop':
             self.next_position = Position.position(self.position.x, self.position.y)
 
-    def turn_left(self):
+    def turn_random(self):
         if self.dir == 'up':
-            self.dir = 'left'
+            self.dir = random.choice(['left', 'right', 'down'])
         elif self.dir == 'down':
-            self.dir = 'right'
+            self.dir = random.choice(['left', 'right', 'up'])
         elif self.dir == 'left':
-            self.dir = 'down'
+            self.dir = random.choice(['up', 'down', 'right'])
         elif self.dir == 'right':
-            self.dir = 'up'
-    
+            self.dir = random.choice(['up', 'down', 'left'])
+
     def catch_delivery(self, dlvery:Delivery.delivery):
         self.delivery = dlvery
         self.in_task = True

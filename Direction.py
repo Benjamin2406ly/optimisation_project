@@ -72,11 +72,11 @@ def robot_next_being_ocuppied(attempt, robot: Robot.robot, other_robot: Robot.ro
         return
     elif robot.next_position.if_eq(other_robot.position):
         if other_robot.dir == 'stop':
-            robot.turn_left()
+            robot.turn_random()
             robot_next_being_ocuppied(attempt + 1, robot, other_robot) 
         elif other_robot.dir != 'stop':
             if direction_if_oppose(robot,other_robot):
-                robot.turn_left()
+                robot.turn_random()
                 robot_next_being_ocuppied(attempt + 1, robot, other_robot)
             else:
                 pass
@@ -90,7 +90,7 @@ def robot_next_will_ocuppied(attempt, robot: Robot.robot, other_robot: Robot.rob
         return     
     elif robot.next_position.if_eq(other_robot.next_position):    
         if direction_if_oppose(robot,other_robot):
-            robot.turn_left()
+            robot.turn_random()
             robot_next_will_ocuppied(attempt + 1, robot, other_robot)
         elif not direction_if_oppose(robot,other_robot):
             if robot.position.x == -2 or robot.position.x == 16 or robot.position.y == -2 or robot.position.y == 16:

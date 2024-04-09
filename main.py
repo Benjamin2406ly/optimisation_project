@@ -146,7 +146,7 @@ def update_delivery(delivery_array:Direction.delivery_array, initwindow:InitWind
             delivery_array.pop(0)
 
 def robot_catch_delivery(robot:Robot.robot, initwindow:InitWindow.initwindow):
-    if initwindow.delivery and robot.position.if_eq(initwindow.position):
+    if initwindow.delivery and robot.position.if_eq(initwindow.position) and not robot.delivery:
         initwindow.robot_catch_delivery(robot)
 
 def robot_send_delivery(robot:Robot.robot):
@@ -185,7 +185,7 @@ def update(frame):
             ax.arrow(*arrow, head_width=0.4, head_length=0.4, fc='blue', ec='black')
 
     if all([robot.item is None for robot in Direction.robots]) and all([initwindow.delivery is None for initwindow in Direction.initwindows]) and not Direction.delivery_array:
-        ani.event_source.stop()
+        # ani.event_source.stop()
         plt.close()
     return ax,
 
