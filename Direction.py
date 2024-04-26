@@ -10,7 +10,7 @@ from scipy.optimize import linear_sum_assignment
 def init():
     global items, informations, initwindows, sendwindows_left, sendwindows_right, sendwindows_top, delivery_array, colors, robots, Path_length, if_optimize, if_consider_collision,num_delivery
 
-    num_delivery = 50
+    num_delivery = 100
     if_optimize = True
     if_consider_collision = True
 
